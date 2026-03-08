@@ -7,6 +7,9 @@ public:
     {
         ReAllec(2);
     }
+    ~Vector() {
+        delete[] m_Data;
+    }
     void PushBack(const T& value)
     {
         if (m_Size>=m_Capacity)
