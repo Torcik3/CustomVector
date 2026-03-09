@@ -29,6 +29,10 @@ v.PushBack(2);
 
     Vector<Panda> p;
     p.EmplaceBack(1,2.3,"lody");
-std::cout<<p[0].z;
+std::cout<<p[0].x;
+
+    std::cout << "Rozmiar przed: " << p.Size() << std::endl;
+p.PopBack();
+    std::cout << "Rozmiar po: " << p.Size() << std::endl;
     return 0;
 }

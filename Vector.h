@@ -1,5 +1,5 @@
 #pragma once
-
+#include "Allocator.h"
 template<typename T>
 class Vector {
 public:
@@ -8,7 +8,13 @@ public:
         ReAllec(2);
     }
     ~Vector() {
-        delete[] m_Data;
+        for (unsigned long long i = 0; i < m_Size; i++) {
+            Allocator<T>::Destroy(&m_Data[i]);
+        }
+
+        if (m_Data != nullptr) {
+            Allocator<T>::Deallocate(m_Data, m_Capacity);
+        }
     }
     void PushBack(const T& value)
     {
@@ -24,7 +30,7 @@ public:
         if (m_Size>=m_Capacity)
             ReAllec(m_Capacity + m_Capacity/2);
 
-        m_Data[m_Size] = std::move(value);
+        Allocator<T>::Constructor(&m_Data[m_Size], std::move(value));
         m_Size++;
     }
 
@@ -33,10 +39,19 @@ public:
         if (m_Size>=m_Capacity)
             ReAllec(m_Capacity + m_Capacity/2);
 
-            m_Data[m_Size]=T(std::forward<Args>(args) ...);
+           Allocator<T>::Constructor(&m_Data[m_Size], std::forward<Args>(args)...);
 
         return m_Data[m_Size++];
     }
+
+   void PopBack() {
+        if (m_Size > 0) {
+            m_Size--;
+            Allocator<T>::Destroy(&m_Data[m_Size]);
+        }
+
+    }
+
 
 const T& operator[](unsigned long long index) const
     {
@@ -56,16 +71,19 @@ const T& operator[](unsigned long long index) const
 private:
     void ReAllec(unsigned long long newCapacity)
     {
-        T* newBlock = new T[newCapacity];
+        T* newBlock = Allocator<T>::Allocate(newCapacity);
 
         if (newCapacity<m_Size)
             m_Size = newCapacity;
 
         for(unsigned long long i = 0; i < m_Size; i++)
         {
-         newBlock[i] = std::move(m_Data[i]);
+            Allocator<T>::Constructor(&newBlock[i], std::move(m_Data[i]));
+            Allocator<T>::Destroy(&m_Data[i]);
         }
-        delete[] m_Data;
+
+        Allocator<T>::Deallocate(m_Data,m_Capacity);
+
         m_Data=newBlock;
         m_Capacity=newCapacity;
     }
