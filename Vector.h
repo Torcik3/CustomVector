@@ -7,6 +7,25 @@ public:
     {
         ReAllec(2);
     }
+
+    Vector(const Vector& other) {
+        m_Size = other.m_Size;
+        m_Capacity = other.m_Capacity;
+        m_Data = Allocator<T>::Allocate(m_Capacity);
+        for (unsigned long long i = 0; i < m_Size; i++) {
+            Allocator<T>::Constructor(&m_Data[i], other.m_Data[i]);
+        }
+    }
+
+    Vector(Vector&& other) noexcept {
+        m_Data = other.m_Data;
+        m_Size = other.m_Size;
+        m_Capacity = other.m_Capacity;
+
+        other.m_Data = nullptr;
+        other.m_Size = 0;
+        other.m_Capacity = 0;
+    }
     ~Vector() {
         for (unsigned long long i = 0; i < m_Size; i++) {
             Allocator<T>::Destroy(&m_Data[i]);
