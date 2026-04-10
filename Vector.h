@@ -40,7 +40,7 @@ public:
         if (m_Size>=m_Capacity)
             ReAllec(m_Capacity + m_Capacity/2);
 
-        m_Data[m_Size] = value;
+        Allocator<T>::Constructor(&m_Data[m_Size], value);
         m_Size++;
     }
 
@@ -71,6 +71,10 @@ public:
 
     }
 
+    T* begin() { return m_Data; }
+    T* end() { return m_Data + m_Size; }
+    const T* begin() const { return m_Data; }
+    const T* end() const { return m_Data + m_Size; }
 
 const T& operator[](unsigned long long index) const
     {
@@ -106,6 +110,8 @@ private:
         m_Data=newBlock;
         m_Capacity=newCapacity;
     }
+
+
 private:
     T* m_Data = nullptr;
     unsigned long long m_Size = 0;
